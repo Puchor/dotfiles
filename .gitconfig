@@ -1,0 +1,7 @@
+[user]
+	name = Lewis Mesa
+	email = lewismesa.cs@gmail.com
+[init]
+	defaultBranch = main
+[core]
+	autocrlf = input
