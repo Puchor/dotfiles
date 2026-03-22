@@ -11,6 +11,12 @@ Personal development environment configuration for WSL2 Ubuntu.
 2. Run the install script: `cd ~/dotfiles && ./install.sh`
 3. Restart your terminal
 
+## Machine-specific configuration
+Each machine can have a `~/.zshrc.local` file for local overrides that 
+won't affect other machines. This file is never committed to the repo.
+Create `~/.zshrc.local` on any machine and add any settings that should
+only apply to that machine — different models, paths, or aliases.
+
 ## Tools configured
 - Zsh + Oh My Zsh
 - Starship prompt
