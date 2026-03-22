@@ -123,3 +123,6 @@ export OLLAMA_CONTEXT_LENGTH=64000
 # Aliases
 # ai — launches Claude Code with local Ollama backend (claude-launcher)
 alias ai='claude-launcher -b'
+
+# Machine-specific overrides
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
