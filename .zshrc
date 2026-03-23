@@ -117,8 +117,5 @@ export ANTHROPIC_AUTH_TOKEN="ollama"
 export ANTHROPIC_API_KEY=""
 export ANTHROPIC_BASE_URL="http://127.0.0.1:11434"
 
-# Ollama context window size (required for Claude Code tool execution)
-export OLLAMA_CONTEXT_LENGTH=64000
-
 # Machine-specific overrides
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
