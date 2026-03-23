@@ -12,12 +12,14 @@ Supports GPU machines (Claude Code via Ollama) and CPU-only machines (Cline + Cl
 - `.gitignore` — Dotfiles repo gitignore (prevents committing machine-specific files)
 - `install.sh` — Bootstrap script with hardware auto-detection
 - `update.sh` — Update script for all tools
+- `cursor/settings.json` — Cursor editor settings (apply manually, see below)
 
 ## Setup on a new machine
 
 1. Clone this repo: `git clone git@github.com:Puchor/dotfiles.git ~/dotfiles`
 2. Run the install script: `cd ~/dotfiles && bash install.sh`
 3. Restart your terminal
+4. Copy `cursor/settings.json` to your Cursor user settings directory (see below)
 
 ## What install.sh does
 
@@ -51,21 +53,17 @@ It contains hardware-specific values: Ollama context length, ai alias, SSH agent
 cd ~/dotfiles && bash update.sh
 ```
 
-## Notes
-
-- `.env` files are never in dotfiles — they belong in each project directory
-- Cursor settings sync via Cursor's built-in Settings Sync (login-based)
-- WSL2 Cursor extensions must be installed manually — see install.sh
-
 ## Cursor settings
 
-`cursor/settings.json` contains the canonical Cursor editor config.
+`cursor/settings.json` contains the canonical Cursor editor settings.
+Cursor's built-in Settings Sync is unreliable across machines — manual copy is the recommended approach.
 
-To apply on any machine, copy it to the Cursor user settings directory:
-
-**Windows:**
+**To apply on any machine (Windows):**
 ```
 Copy cursor/settings.json to C:\Users\<username>\AppData\Roaming\Cursor\User\settings.json
 ```
 
-Settings Sync in Cursor is not reliable across machines — manual copy is the recommended approach.
+## Notes
+
+- `.env` files are never in dotfiles — they belong in each project directory
+- WSL2 Cursor extensions must be installed manually — see install.sh
