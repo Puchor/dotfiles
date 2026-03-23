@@ -286,6 +286,9 @@ export OLLAMA_CONTEXT_LENGTH=$CONTEXT_LENGTH
 
 # Claude Code launcher
 $AI_ALIAS
+
+# Auto-add SSH key to agent on shell start
+ssh-add ~/.ssh/id_ed25519 2>/dev/null
 EOF
 
 echo "   .zshrc.local generated."
