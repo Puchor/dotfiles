@@ -217,9 +217,26 @@ detect_nvidia() {
 
 detect_amd() {
     if lspci 2>/dev/null | grep -i "amd" | grep -i "vga\|3d\|display" &> /dev/null; then
-        echo "   AMD GPU detected"
-        OLLAMA_MODEL="glm-4.7-flash"
-        CONTEXT_LENGTH=8192
+        if command -v rocm-smi &> /dev/null; then
+            VRAM=$(rocm-smi --showmeminfo vram 2>/dev/null | awk '/Total Memory/ {print int($NF/1024/1024)}' | head -1)
+        else
+            VRAM=$(lspci -v 2>/dev/null | grep -A 10 -i "amd" | grep -i "prefetchable" | grep -oP '[0-9]+(?=M)' | sort -n | tail -1)
+        fi
+        VRAM=${VRAM:-0}
+        echo "   AMD GPU detected — ${VRAM}MB VRAM"
+        if [ "$VRAM" -ge 24000 ]; then
+            OLLAMA_MODEL="glm-4.7-flash"
+            CONTEXT_LENGTH=32000
+        elif [ "$VRAM" -ge 16000 ]; then
+            OLLAMA_MODEL="glm-4.7-flash"
+            CONTEXT_LENGTH=16000
+        elif [ "$VRAM" -ge 8000 ]; then
+            OLLAMA_MODEL="glm-4.7-flash"
+            CONTEXT_LENGTH=8192
+        else
+            OLLAMA_MODEL="glm-4.7-flash"
+            CONTEXT_LENGTH=4096
+        fi
         return 0
     fi
     return 1

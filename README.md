@@ -44,7 +44,10 @@ It contains hardware-specific values: Ollama context length, ai alias, SSH agent
 | Nvidia ≥16GB VRAM | glm-4.7-flash / dev-cc | 16k | ✅ |
 | Nvidia ≥8GB VRAM | glm-4.7-flash / dev-cc | 8k | ✅ |
 | Nvidia <8GB VRAM | glm-4.7-flash / dev-cc | 4k | ✅ |
-| AMD GPU | glm-4.7-flash / dev-cc | 8k | ✅ |
+| AMD ≥24GB VRAM | glm-4.7-flash / dev-cc | 32k | ✅ |
+| AMD ≥16GB VRAM | glm-4.7-flash / dev-cc | 16k | ✅ |
+| AMD ≥8GB VRAM | glm-4.7-flash / dev-cc | 8k | ✅ |
+| AMD <8GB VRAM | glm-4.7-flash / dev-cc | 4k | ✅ |
 | Intel Arc | glm-4.7-flash / dev-cc | 8k | ✅ |
 | CPU only | — | — | ❌ Use Cline + Claude.ai |
 
