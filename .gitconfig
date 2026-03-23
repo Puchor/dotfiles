@@ -5,3 +5,6 @@
 	defaultBranch = main
 [core]
 	autocrlf = input
+	excludesfile = /home/ruinr/dotfiles/.gitignore_global
+[commit]
+	template = /home/ruinr/dotfiles/.gitmessage

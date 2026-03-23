@@ -1,0 +1,6 @@
+# <type>: <subject> (50 chars max)
+
+# Body — explain WHAT and WHY, not HOW (wrap at 72 chars)
+
+# Types: feat | fix | chore | docs | refactor | test | style
+# Example: feat: add travel time buffer to shift creation
