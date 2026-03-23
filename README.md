@@ -69,4 +69,4 @@ Copy cursor/settings.json to C:\Users\<username>\AppData\Roaming\Cursor\User\set
 ## Notes
 
 - `.env` files are never in dotfiles — they belong in each project directory
-- WSL2 Cursor extensions must be installed manually — see install.sh
+- WSL2 Cursor extensions are installed automatically by install.sh when Cursor is detected
