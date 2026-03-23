@@ -3,9 +3,10 @@
 # =============================================================================
 # Dotfiles Bootstrap Script
 # Automatically detects hardware and configures the development environment
+# Run this after cloning the dotfiles repo on a new machine
 # =============================================================================
 
-set -e  # Exit on any error
+set -e
 
 DOTFILES_DIR="$HOME/dotfiles"
 
@@ -16,14 +17,19 @@ echo "====================================="
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 1 — Create symlinks
+# Step 1 — Git configuration
 # -----------------------------------------------------------------------------
-echo ">> Creating symlinks..."
+echo ">> Configuring Git..."
 
-ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
-ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+read -p "   Enter your full name: " GIT_NAME
+read -p "   Enter your GitHub email: " GIT_EMAIL
 
-echo "   Symlinks created."
+git config --global user.name "$GIT_NAME"
+git config --global user.email "$GIT_EMAIL"
+git config --global init.defaultBranch main
+git config --global core.autocrlf input
+
+echo "   Git configured."
 echo ""
 
 # -----------------------------------------------------------------------------
@@ -43,7 +49,13 @@ echo ""
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo ">> Installing Oh My Zsh..."
     RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    chsh -s $(which zsh)
+    # Change default shell to Zsh
+    ZSH_PATH=$(which zsh)
+    if chsh -s "$ZSH_PATH" 2>/dev/null; then
+        echo "   Default shell changed to Zsh."
+    else
+        echo "   Could not change shell automatically — run: chsh -s $(which zsh)"
+    fi
     echo "   Oh My Zsh installed."
 else
     echo ">> Oh My Zsh already installed, skipping."
@@ -51,7 +63,18 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 4 — Install Zsh plugins
+# Step 4 — Create symlinks (after Oh My Zsh to prevent overwrite)
+# -----------------------------------------------------------------------------
+echo ">> Creating symlinks..."
+
+ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
+ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+
+echo "   Symlinks created."
+echo ""
+
+# -----------------------------------------------------------------------------
+# Step 5 — Install Zsh plugins
 # -----------------------------------------------------------------------------
 echo ">> Installing Zsh plugins..."
 
@@ -69,7 +92,7 @@ echo "   Plugins installed."
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 5 — Install Starship
+# Step 6 — Install Starship
 # -----------------------------------------------------------------------------
 if ! command -v starship &> /dev/null; then
     echo ">> Installing Starship..."
@@ -81,7 +104,7 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 6 — Install nvm and Node.js
+# Step 7 — Install nvm and Node.js
 # -----------------------------------------------------------------------------
 if [ ! -d "$HOME/.nvm" ]; then
     echo ">> Installing nvm..."
@@ -96,7 +119,7 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 7 — Install Python
+# Step 8 — Install Python
 # -----------------------------------------------------------------------------
 echo ">> Installing Python..."
 sudo apt install -y python3 python3-pip python3-venv
@@ -104,7 +127,7 @@ echo "   Python installed."
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 8 — Install Docker
+# Step 9 — Install Docker
 # -----------------------------------------------------------------------------
 if ! command -v docker &> /dev/null; then
     echo ">> Installing Docker..."
@@ -122,7 +145,7 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 9 — Install AWS CLI
+# Step 10 — Install AWS CLI
 # -----------------------------------------------------------------------------
 if ! command -v aws &> /dev/null; then
     echo ">> Installing AWS CLI..."
@@ -137,7 +160,7 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 10 — Install GitHub CLI
+# Step 11 — Install GitHub CLI
 # -----------------------------------------------------------------------------
 if ! command -v gh &> /dev/null; then
     echo ">> Installing GitHub CLI..."
@@ -149,7 +172,7 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 11 — Install Ollama
+# Step 12 — Install Ollama
 # -----------------------------------------------------------------------------
 if ! command -v ollama &> /dev/null; then
     echo ">> Installing Ollama..."
@@ -161,13 +184,14 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 12 — Hardware detection and model selection
+# Step 13 — Hardware detection and model selection
 # -----------------------------------------------------------------------------
 echo ">> Detecting hardware..."
 
 OLLAMA_MODEL=""
 CONTEXT_LENGTH=""
 AI_ALIAS=""
+CPU_ONLY=false
 
 detect_nvidia() {
     if command -v nvidia-smi &> /dev/null; then
@@ -180,10 +204,10 @@ detect_nvidia() {
             OLLAMA_MODEL="glm-4.7-flash"
             CONTEXT_LENGTH=16000
         elif [ "$VRAM" -ge 8000 ]; then
-            OLLAMA_MODEL="qwen2.5-coder:7b"
+            OLLAMA_MODEL="glm-4.7-flash"
             CONTEXT_LENGTH=8192
         else
-            OLLAMA_MODEL="qwen2.5-coder:3b"
+            OLLAMA_MODEL="glm-4.7-flash"
             CONTEXT_LENGTH=4096
         fi
         return 0
@@ -193,8 +217,8 @@ detect_nvidia() {
 
 detect_amd() {
     if lspci 2>/dev/null | grep -i "amd" | grep -i "vga\|3d\|display" &> /dev/null; then
-        echo "   AMD GPU detected — attempting ROCm path"
-        OLLAMA_MODEL="qwen2.5-coder:7b"
+        echo "   AMD GPU detected"
+        OLLAMA_MODEL="glm-4.7-flash"
         CONTEXT_LENGTH=8192
         return 0
     fi
@@ -204,7 +228,7 @@ detect_amd() {
 detect_intel_arc() {
     if lspci 2>/dev/null | grep -i "intel arc" &> /dev/null; then
         echo "   Intel Arc GPU detected"
-        OLLAMA_MODEL="qwen2.5-coder:7b"
+        OLLAMA_MODEL="glm-4.7-flash"
         CONTEXT_LENGTH=8192
         return 0
     fi
@@ -214,15 +238,11 @@ detect_intel_arc() {
 detect_cpu_only() {
     RAM=$(free -m | awk '/^Mem:/{print $2}')
     echo "   No discrete GPU detected — CPU only, ${RAM}MB RAM"
-    if [ "$RAM" -ge 12000 ]; then
-        OLLAMA_MODEL="qwen2.5-coder:3b"
-        CONTEXT_LENGTH=2048
-    else
-        echo "   Insufficient RAM for local AI — skipping Ollama model setup"
-        echo "   Use Claude.ai in browser for AI assistance"
-        OLLAMA_MODEL=""
-        CONTEXT_LENGTH=""
-    fi
+    echo "   Claude Code via Ollama is not viable on CPU-only hardware"
+    echo "   Recommendation: Use Cline extension in Cursor + Claude.ai in browser"
+    CPU_ONLY=true
+    OLLAMA_MODEL=""
+    CONTEXT_LENGTH=""
 }
 
 if ! detect_nvidia; then
@@ -236,13 +256,12 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 13 — Pull and configure Ollama model
+# Step 14 — Pull and configure Ollama model
 # -----------------------------------------------------------------------------
 if [ -n "$OLLAMA_MODEL" ]; then
     echo ">> Setting up Ollama model: $OLLAMA_MODEL"
     ollama pull "$OLLAMA_MODEL"
 
-    # Create custom model with correct context window
     MODELFILE="/tmp/Modelfile"
     echo "FROM $OLLAMA_MODEL" > "$MODELFILE"
     echo "PARAMETER num_ctx $CONTEXT_LENGTH" >> "$MODELFILE"
@@ -252,27 +271,32 @@ if [ -n "$OLLAMA_MODEL" ]; then
     AI_ALIAS="alias ai='claude --model dev-cc --dangerously-skip-permissions'"
     echo "   Model configured."
 else
-    AI_ALIAS="# ai alias not configured — no suitable GPU/RAM detected"
+    AI_ALIAS="# ai alias not configured — CPU only machine, use Cline + Claude.ai instead"
 fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 14 — Install Claude Code and claude-launcher
+# Step 15 — Install Claude Code and claude-launcher
 # -----------------------------------------------------------------------------
-if ! command -v claude &> /dev/null; then
-    echo ">> Installing Claude Code..."
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    npm install -g @anthropic-ai/claude-code
-    npm install -g claude-launcher
-    echo "   Claude Code installed."
+if [ "$CPU_ONLY" = false ]; then
+    if ! command -v claude &> /dev/null; then
+        echo ">> Installing Claude Code..."
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        npm install -g @anthropic-ai/claude-code
+        npm install -g claude-launcher
+        echo "   Claude Code installed."
+    else
+        echo ">> Claude Code already installed, skipping."
+    fi
 else
-    echo ">> Claude Code already installed, skipping."
+    echo ">> Skipping Claude Code — CPU only machine."
+    echo "   Install Cline extension in Cursor after setup."
 fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 15 — Generate .zshrc.local
+# Step 16 — Generate .zshrc.local
 # -----------------------------------------------------------------------------
 echo ">> Generating .zshrc.local..."
 
@@ -282,7 +306,7 @@ cat > "$HOME/.zshrc.local" << EOF
 # Hardware: $(lscpu | grep "Model name" | sed 's/Model name:[ \t]*//')
 
 # Ollama context window
-export OLLAMA_CONTEXT_LENGTH=$CONTEXT_LENGTH
+export OLLAMA_CONTEXT_LENGTH=${CONTEXT_LENGTH:-0}
 
 # Claude Code launcher
 $AI_ALIAS
@@ -296,7 +320,7 @@ echo "   .zshrc.local generated."
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 16 — Install Cursor extensions
+# Step 17 — Install Cursor extensions
 # -----------------------------------------------------------------------------
 if command -v cursor &> /dev/null; then
     echo ">> Installing Cursor extensions..."
@@ -311,7 +335,9 @@ if command -v cursor &> /dev/null; then
     cursor --install-extension prisma.prisma
     echo "   Extensions installed."
 else
-    echo ">> Cursor not found — skipping extensions."
+    echo ">> Cursor not detected in WSL2 — skipping extensions."
+    echo "   After installing Cursor on Windows and connecting to WSL2,"
+    echo "   run: cursor --install-extension <extension-id> for each extension."
 fi
 echo ""
 
@@ -324,7 +350,13 @@ echo "====================================="
 echo ""
 echo "Next steps:"
 echo "  1. Restart your terminal"
-echo "  2. Run 'gh auth login' to authenticate GitHub CLI"
-echo "  3. Generate SSH key: ssh-keygen -t ed25519 -C 'your@email.com'"
-echo "  4. Add SSH key to GitHub"
+echo "  2. Generate SSH key: ssh-keygen -t ed25519 -C '$GIT_EMAIL'"
+echo "  3. Add SSH key to GitHub: cat ~/.ssh/id_ed25519.pub"
+echo "  4. Authenticate GitHub CLI: gh auth login"
+if [ "$CPU_ONLY" = true ]; then
+echo "  5. Install Cline extension in Cursor for AI coding assistance"
+echo "  6. Use Claude.ai in browser for planning and architecture"
+else
+echo "  5. Test Claude Code: cd ~/projects && mkdir test && cd test && ai"
+fi
 echo ""
