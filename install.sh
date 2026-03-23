@@ -287,7 +287,8 @@ export OLLAMA_CONTEXT_LENGTH=$CONTEXT_LENGTH
 # Claude Code launcher
 $AI_ALIAS
 
-# Auto-add SSH key to agent on shell start
+# Start SSH agent and add key automatically
+eval "\$(ssh-agent -s)" > /dev/null 2>&1
 ssh-add ~/.ssh/id_ed25519 2>/dev/null
 EOF
 
