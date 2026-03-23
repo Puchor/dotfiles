@@ -27,3 +27,4 @@ only apply to that machine — different models, paths, or aliases.
 - Docker
 - AWS CLI
 - Ollama + Claude Code (running locally with qwen3-coder-cc, 32k context)
+# Last updated: Sun Mar 22 23:28:20 EDT 2026
