@@ -56,3 +56,16 @@ cd ~/dotfiles && bash update.sh
 - `.env` files are never in dotfiles — they belong in each project directory
 - Cursor settings sync via Cursor's built-in Settings Sync (login-based)
 - WSL2 Cursor extensions must be installed manually — see install.sh
+
+## Cursor settings
+
+`cursor/settings.json` contains the canonical Cursor editor config.
+
+To apply on any machine, copy it to the Cursor user settings directory:
+
+**Windows:**
+```
+Copy cursor/settings.json to C:\Users\<username>\AppData\Roaming\Cursor\User\settings.json
+```
+
+Settings Sync in Cursor is not reliable across machines — manual copy is the recommended approach.
