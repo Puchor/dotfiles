@@ -120,9 +120,5 @@ export ANTHROPIC_BASE_URL="http://127.0.0.1:11434"
 # Ollama context window size (required for Claude Code tool execution)
 export OLLAMA_CONTEXT_LENGTH=64000
 
-# Aliases
-# ai — launches Claude Code with local Ollama backend (claude-launcher)
-alias ai='claude --model glm-cc --dangerously-skip-permissions'
-
 # Machine-specific overrides
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
