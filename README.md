@@ -49,7 +49,7 @@ It contains hardware-specific values: Ollama context length, ai alias, SSH agent
 | AMD ≥8GB VRAM | glm-4.7-flash / dev-cc | 8k | ✅ |
 | AMD <8GB VRAM | glm-4.7-flash / dev-cc | 4k | ✅ |
 | Intel Arc | glm-4.7-flash / dev-cc | 8k | ✅ |
-| CPU only | — | — | ❌ Use Cline + Claude.ai |
+| CPU only | — | — | ❌ Use Cline + Gemini API Key |
 
 ## Keeping up to date
 ```bash
