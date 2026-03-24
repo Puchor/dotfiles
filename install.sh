@@ -350,6 +350,7 @@ if command -v cursor &> /dev/null; then
     cursor --install-extension ms-azuretools.vscode-containers
     cursor --install-extension ms-azuretools.vscode-docker
     cursor --install-extension prisma.prisma
+    cursor --install-extension saoudrizwan.claude-dev
     echo "   Extensions installed."
 else
     echo ">> Cursor not detected in WSL2 — skipping extensions."

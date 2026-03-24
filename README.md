@@ -70,3 +70,4 @@ Copy cursor/settings.json to C:\Users\<username>\AppData\Roaming\Cursor\User\set
 
 - `.env` files are never in dotfiles — they belong in each project directory
 - WSL2 Cursor extensions are installed automatically by install.sh when Cursor is detected
+- Cline (saoudrizwan.claude-dev) is installed on all machines — points to Ollama on GPU machines, Gemini 2.5 Flash on CPU-only machines
