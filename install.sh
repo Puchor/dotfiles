@@ -217,12 +217,12 @@ detect_nvidia() {
 
 detect_amd() {
     if lspci 2>/dev/null | grep -i "amd" | grep -i "vga\|3d\|display" &> /dev/null; then
+        # Try to get VRAM via rocm-smi if available, otherwise default
         if command -v rocm-smi &> /dev/null; then
-            VRAM=$(rocm-smi --showmeminfo vram 2>/dev/null | awk '/Total Memory/ {print int($NF/1024/1024)}' | head -1)
+            VRAM=$(rocm-smi --showmeminfo vram --csv 2>/dev/null | awk -F',' 'NR==2{print int($2/1024/1024)}')
         else
-            VRAM=$(lspci -v 2>/dev/null | grep -A 10 -i "amd" | grep -i "prefetchable" | grep -oP '[0-9]+(?=M)' | sort -n | tail -1)
+            VRAM=0
         fi
-        VRAM=${VRAM:-0}
         echo "   AMD GPU detected — ${VRAM}MB VRAM"
         if [ "$VRAM" -ge 24000 ]; then
             OLLAMA_MODEL="glm-4.7-flash"
@@ -350,7 +350,6 @@ if command -v cursor &> /dev/null; then
     cursor --install-extension ms-azuretools.vscode-containers
     cursor --install-extension ms-azuretools.vscode-docker
     cursor --install-extension prisma.prisma
-    cursor --install-extension saoudrizwan.claude-dev
     echo "   Extensions installed."
 else
     echo ">> Cursor not detected in WSL2 — skipping extensions."
