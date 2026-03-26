@@ -1,7 +1,7 @@
 # Dotfiles
 
 Personal development environment for WSL2 Ubuntu.
-Supports GPU machines (Claude Code via Ollama) and CPU-only machines (Cline + Claude.ai).
+Supports GPU machines (Claude Code via Ollama) and CPU-only machines (Cline + AI Model via API Key).
 
 ## What's included
 
