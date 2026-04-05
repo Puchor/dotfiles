@@ -83,12 +83,11 @@ echo "   npm updated."
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 8 — Update Claude Code and claude-launcher
+# Step 8 — Update Claude Code
 # -----------------------------------------------------------------------------
 if command -v claude &> /dev/null; then
     echo ">> Updating Claude Code..."
     npm install -g @anthropic-ai/claude-code
-    npm install -g claude-launcher
     echo "   Claude Code updated."
 else
     echo ">> Claude Code not installed — skipping."

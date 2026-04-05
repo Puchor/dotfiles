@@ -293,7 +293,7 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 15 — Install Claude Code and claude-launcher
+# Step 15 — Install Claude Code
 # -----------------------------------------------------------------------------
 if [ "$CPU_ONLY" = false ]; then
     if ! command -v claude &> /dev/null; then
@@ -301,7 +301,6 @@ if [ "$CPU_ONLY" = false ]; then
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
         npm install -g @anthropic-ai/claude-code
-        npm install -g claude-launcher
         echo "   Claude Code installed."
     else
         echo ">> Claude Code already installed, skipping."
