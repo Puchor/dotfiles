@@ -27,7 +27,7 @@ Supports GPU machines (Claude Code via Ollama) and CPU-only machines (Cline + AI
 2. Installs core packages, Oh My Zsh, Zsh plugins, Starship, nvm, Python, Docker, AWS CLI, GitHub CLI, Ollama
 3. Auto-detects hardware (Nvidia/AMD/Intel Arc/CPU only)
 4. Pulls glm-4.7-flash and creates dev-cc custom model (GPU machines only)
-5. Installs Claude Code + claude-launcher (GPU machines only)
+5. Installs Claude Code (GPU machines only)
 6. Generates ~/.zshrc.local with correct context length, ai alias, SSH agent
 7. Installs Cursor extensions if Cursor is detected in WSL2
 
