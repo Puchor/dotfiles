@@ -85,13 +85,9 @@ echo ""
 # -----------------------------------------------------------------------------
 # Step 8 — Update Claude Code
 # -----------------------------------------------------------------------------
-if command -v claude &> /dev/null; then
-    echo ">> Updating Claude Code..."
-    npm install -g @anthropic-ai/claude-code
-    echo "   Claude Code updated."
-else
-    echo ">> Claude Code not installed — skipping."
-fi
+echo ">> Updating Claude Code..."
+npm install -g @anthropic-ai/claude-code
+echo "   Claude Code updated."
 echo ""
 
 # -----------------------------------------------------------------------------

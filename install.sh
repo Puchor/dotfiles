@@ -282,6 +282,7 @@ if [ -n "$OLLAMA_MODEL" ]; then
     MODELFILE="/tmp/Modelfile"
     echo "FROM $OLLAMA_MODEL" > "$MODELFILE"
     echo "PARAMETER num_ctx $CONTEXT_LENGTH" >> "$MODELFILE"
+    echo "PARAMETER temperature 0" >> "$MODELFILE"
     ollama create dev-cc -f "$MODELFILE"
     rm "$MODELFILE"
 
