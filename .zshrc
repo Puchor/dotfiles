@@ -119,3 +119,4 @@ export ANTHROPIC_BASE_URL="http://127.0.0.1:11434"
 
 # Machine-specific overrides
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+export PATH="/home/ruinr/.nvm/versions/node/v24.14.1/bin:$PATH"

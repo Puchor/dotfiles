@@ -26,7 +26,7 @@ Supports GPU machines (Claude Code via Ollama) and CPU-only machines (Cline + AI
 1. Prompts for Git name/email and configures global Git settings
 2. Installs core packages, Oh My Zsh, Zsh plugins, Starship, nvm, Python, Docker, AWS CLI, GitHub CLI, Ollama
 3. Auto-detects hardware (Nvidia/AMD/Intel Arc/CPU only)
-4. Pulls glm-4.7-flash and creates dev-cc custom model (GPU machines only)
+4. Pulls qwen3-coder:30b and creates qwen3-coder-cc custom model (GPU machines only)
 5. Installs Claude Code (GPU machines only)
 6. Generates ~/.zshrc.local with correct context length, ai alias, SSH agent
 7. Installs Cursor extensions if Cursor is detected in WSL2
@@ -40,16 +40,16 @@ It contains hardware-specific values: Ollama context length, ai alias, SSH agent
 
 | Hardware | Model | Context | Claude Code |
 |---|---|---|---|
-| Nvidia ≥24GB VRAM | glm-4.7-flash / dev-cc | 32k | ✅ |
-| Nvidia ≥16GB VRAM | glm-4.7-flash / dev-cc | 16k | ✅ |
-| Nvidia ≥8GB VRAM | glm-4.7-flash / dev-cc | 8k | ✅ |
-| Nvidia <8GB VRAM | glm-4.7-flash / dev-cc | 4k | ✅ |
-| AMD ≥24GB VRAM | glm-4.7-flash / dev-cc | 32k | ✅ |
-| AMD ≥16GB VRAM | glm-4.7-flash / dev-cc | 16k | ✅ |
-| AMD ≥8GB VRAM | glm-4.7-flash / dev-cc | 8k | ✅ |
-| AMD <8GB VRAM | glm-4.7-flash / dev-cc | 4k | ✅ |
-| Intel Arc | glm-4.7-flash / dev-cc | 8k | ✅ |
-| CPU only | — | — | ❌ Use Cline + Gemini API Key |
+| Nvidia ≥24GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 64k | ✅ |
+| Nvidia ≥16GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 64k | ✅ |
+| Nvidia ≥8GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 32k | ✅ |
+| Nvidia <8GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 16k | ✅ |
+| AMD ≥24GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 64k | ✅ |
+| AMD ≥16GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 64k | ✅ |
+| AMD ≥8GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 32k | ✅ |
+| AMD <8GB VRAM | qwen3-coder:30b / qwen3-coder-cc | 16k | ✅ |
+| Intel Arc | qwen3-coder:30b / qwen3-coder-cc | 16k | ✅ |
+| CPU only | — | — | ❌ Use Cline + Claude.ai |
 
 ## Keeping up to date
 ```bash
@@ -70,4 +70,4 @@ Copy cursor/settings.json to C:\Users\<username>\AppData\Roaming\Cursor\User\set
 
 - `.env` files are never in dotfiles — they belong in each project directory
 - WSL2 Cursor extensions are installed automatically by install.sh when Cursor is detected
-- Cline (saoudrizwan.claude-dev) is installed on all machines — points to Ollama on GPU machines, Gemini 2.5 Flash on CPU-only machines
+- Cline (saoudrizwan.claude-dev) is installed on all machines — points to Ollama on GPU machines, Claude.ai on CPU-only machines

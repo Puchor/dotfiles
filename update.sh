@@ -118,7 +118,19 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 11 — Update Cursor extensions
+# Step 11 — Update qwen3-coder:30b base model
+# -----------------------------------------------------------------------------
+if command -v ollama &> /dev/null && ollama list | grep -q "qwen3-coder:30b"; then
+    echo ">> Updating qwen3-coder:30b..."
+    ollama pull qwen3-coder:30b
+    echo "   qwen3-coder:30b updated."
+else
+    echo ">> qwen3-coder:30b not installed — skipping."
+fi
+echo ""
+
+# -----------------------------------------------------------------------------
+# Step 12 — Update Cursor extensions
 # -----------------------------------------------------------------------------
 if command -v cursor &> /dev/null; then
     echo ">> Updating Cursor extensions..."
@@ -131,6 +143,7 @@ if command -v cursor &> /dev/null; then
     cursor --install-extension ms-azuretools.vscode-containers
     cursor --install-extension ms-azuretools.vscode-docker
     cursor --install-extension prisma.prisma
+    cursor --install-extension saoudrizwan.claude-dev
     echo "   Extensions updated."
 else
     echo ">> Cursor not detected in WSL2 — skipping extensions."

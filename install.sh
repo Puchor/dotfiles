@@ -188,7 +188,8 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">> Detecting hardware..."
 
-OLLAMA_MODEL=""
+OLLAMA_BASE_MODEL="qwen3-coder:30b"
+OLLAMA_CUSTOM_MODEL="qwen3-coder-cc"
 CONTEXT_LENGTH=""
 AI_ALIAS=""
 CPU_ONLY=false
@@ -198,17 +199,13 @@ detect_nvidia() {
         VRAM=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -1 | tr -d ' ')
         echo "   Nvidia GPU detected — ${VRAM}MB VRAM"
         if [ "$VRAM" -ge 24000 ]; then
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=32000
+            CONTEXT_LENGTH=65536
         elif [ "$VRAM" -ge 16000 ]; then
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=16000
+            CONTEXT_LENGTH=65536
         elif [ "$VRAM" -ge 8000 ]; then
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=8192
+            CONTEXT_LENGTH=32768
         else
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=4096
+            CONTEXT_LENGTH=16384
         fi
         return 0
     fi
@@ -217,7 +214,6 @@ detect_nvidia() {
 
 detect_amd() {
     if lspci 2>/dev/null | grep -i "amd" | grep -i "vga\|3d\|display" &> /dev/null; then
-        # Try to get VRAM via rocm-smi if available, otherwise default
         if command -v rocm-smi &> /dev/null; then
             VRAM=$(rocm-smi --showmeminfo vram --csv 2>/dev/null | awk -F',' 'NR==2{print int($2/1024/1024)}')
         else
@@ -225,17 +221,13 @@ detect_amd() {
         fi
         echo "   AMD GPU detected — ${VRAM}MB VRAM"
         if [ "$VRAM" -ge 24000 ]; then
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=32000
+            CONTEXT_LENGTH=65536
         elif [ "$VRAM" -ge 16000 ]; then
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=16000
+            CONTEXT_LENGTH=65536
         elif [ "$VRAM" -ge 8000 ]; then
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=8192
+            CONTEXT_LENGTH=32768
         else
-            OLLAMA_MODEL="glm-4.7-flash"
-            CONTEXT_LENGTH=4096
+            CONTEXT_LENGTH=16384
         fi
         return 0
     fi
@@ -245,8 +237,7 @@ detect_amd() {
 detect_intel_arc() {
     if lspci 2>/dev/null | grep -i "intel arc" &> /dev/null; then
         echo "   Intel Arc GPU detected"
-        OLLAMA_MODEL="glm-4.7-flash"
-        CONTEXT_LENGTH=8192
+        CONTEXT_LENGTH=16384
         return 0
     fi
     return 1
@@ -258,7 +249,6 @@ detect_cpu_only() {
     echo "   Claude Code via Ollama is not viable on CPU-only hardware"
     echo "   Recommendation: Use Cline extension in Cursor + Claude.ai in browser"
     CPU_ONLY=true
-    OLLAMA_MODEL=""
     CONTEXT_LENGTH=""
 }
 
@@ -275,18 +265,18 @@ echo ""
 # -----------------------------------------------------------------------------
 # Step 14 — Pull and configure Ollama model
 # -----------------------------------------------------------------------------
-if [ -n "$OLLAMA_MODEL" ]; then
-    echo ">> Setting up Ollama model: $OLLAMA_MODEL"
-    ollama pull "$OLLAMA_MODEL"
+if [ "$CPU_ONLY" = false ]; then
+    echo ">> Setting up Ollama model: $OLLAMA_BASE_MODEL"
+    ollama pull "$OLLAMA_BASE_MODEL"
 
     MODELFILE="/tmp/Modelfile"
-    echo "FROM $OLLAMA_MODEL" > "$MODELFILE"
+    echo "FROM $OLLAMA_BASE_MODEL" > "$MODELFILE"
     echo "PARAMETER num_ctx $CONTEXT_LENGTH" >> "$MODELFILE"
     echo "PARAMETER temperature 0" >> "$MODELFILE"
-    ollama create dev-cc -f "$MODELFILE"
+    ollama create "$OLLAMA_CUSTOM_MODEL" -f "$MODELFILE"
     rm "$MODELFILE"
 
-    AI_ALIAS="alias ai='claude --model dev-cc --dangerously-skip-permissions'"
+    AI_ALIAS="alias ai='claude --model $OLLAMA_CUSTOM_MODEL --dangerously-skip-permissions'"
     echo "   Model configured."
 else
     AI_ALIAS="# ai alias not configured — CPU only machine, use Cline + Claude.ai instead"
@@ -373,6 +363,7 @@ if command -v cursor &> /dev/null; then
     cursor --install-extension ms-azuretools.vscode-containers
     cursor --install-extension ms-azuretools.vscode-docker
     cursor --install-extension prisma.prisma
+    cursor --install-extension saoudrizwan.claude-dev
     echo "   Extensions installed."
 else
     echo ">> Cursor not detected in WSL2 — skipping extensions."
