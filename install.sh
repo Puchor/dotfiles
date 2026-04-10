@@ -306,6 +306,29 @@ if [ "$CPU_ONLY" = false ]; then
     else
         echo ">> Claude Code already installed, skipping."
     fi
+    # Patch ~/.claude.json MCP servers to use absolute npx path (fixes non-interactive shell PATH issue)
+    NPX_PATH="$(which npx 2>/dev/null)"
+    if [ -n "$NPX_PATH" ] && [ -f "$HOME/.claude.json" ]; then
+        echo ">> Patching ~/.claude.json MCP servers with absolute npx path..."
+        python3 -c "
+import json, sys
+path = '$HOME/.claude.json'
+npx = '$NPX_PATH'
+with open(path) as f:
+    d = json.load(f)
+if 'mcpServers' in d:
+    for s in d['mcpServers'].values():
+        if s.get('command') == 'npx':
+            s['command'] = npx
+    with open(path, 'w') as f:
+        json.dump(d, f, indent=2)
+    print('   MCP servers patched.')
+else:
+    print('   No mcpServers found, skipping.')
+"
+    else
+        echo ">> Skipping MCP patch — npx not found or ~/.claude.json does not exist."
+    fi
 else
     echo ">> Skipping Claude Code — CPU only machine."
     echo "   Install Cline extension in Cursor after setup."
