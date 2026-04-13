@@ -188,8 +188,8 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">> Detecting hardware..."
 
-OLLAMA_BASE_MODEL="qwen3-coder:30b"
-OLLAMA_CUSTOM_MODEL="qwen3-coder-cc"
+OLLAMA_BASE_MODEL="glm-4.7-flash"
+OLLAMA_CUSTOM_MODEL="glm-4.7-flash-cc"
 CONTEXT_LENGTH=""
 AI_ALIAS=""
 CPU_ONLY=false
@@ -205,7 +205,7 @@ detect_nvidia() {
         elif [ "$VRAM" -ge 8000 ]; then
             CONTEXT_LENGTH=32768
         else
-            CONTEXT_LENGTH=16384
+            CPU_ONLY=true; CONTEXT_LENGTH=""
         fi
         return 0
     fi
@@ -227,7 +227,7 @@ detect_amd() {
         elif [ "$VRAM" -ge 8000 ]; then
             CONTEXT_LENGTH=32768
         else
-            CONTEXT_LENGTH=16384
+            CPU_ONLY=true; CONTEXT_LENGTH=""
         fi
         return 0
     fi
@@ -237,7 +237,7 @@ detect_amd() {
 detect_intel_arc() {
     if lspci 2>/dev/null | grep -i "intel arc" &> /dev/null; then
         echo "   Intel Arc GPU detected"
-        CONTEXT_LENGTH=16384
+        CPU_ONLY=true; CONTEXT_LENGTH=""
         return 0
     fi
     return 1
@@ -276,7 +276,10 @@ if [ "$CPU_ONLY" = false ]; then
     ollama create "$OLLAMA_CUSTOM_MODEL" -f "$MODELFILE"
     rm "$MODELFILE"
 
-    AI_ALIAS="alias ai='claude --model $OLLAMA_CUSTOM_MODEL --dangerously-skip-permissions'"
+    AI_ALIAS="export ANTHROPIC_DEFAULT_HAIKU_MODEL=$OLLAMA_CUSTOM_MODEL
+export ANTHROPIC_DEFAULT_SONNET_MODEL=$OLLAMA_CUSTOM_MODEL
+export ANTHROPIC_DEFAULT_OPUS_MODEL=$OLLAMA_CUSTOM_MODEL
+alias ai='claude --dangerously-skip-permissions'"
     echo "   Model configured."
 else
     AI_ALIAS="# ai alias not configured — CPU only machine, use Cline + Claude.ai instead"

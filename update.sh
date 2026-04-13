@@ -118,14 +118,24 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 11 — Update qwen3-coder:30b base model
+# Step 11 — Update glm-4.7-flash base model
 # -----------------------------------------------------------------------------
-if command -v ollama &> /dev/null && ollama list | grep -q "qwen3-coder:30b"; then
-    echo ">> Updating qwen3-coder:30b..."
-    ollama pull qwen3-coder:30b
-    echo "   qwen3-coder:30b updated."
+if command -v ollama &> /dev/null && ollama list | grep -q "glm-4.7-flash"; then
+    echo ">> Updating glm-4.7-flash..."
+    ollama pull glm-4.7-flash
+    echo "   glm-4.7-flash updated."
+    if ollama list | grep -q "glm-4.7-flash-cc"; then
+        echo ">> Rebuilding glm-4.7-flash-cc against updated base..."
+        MODELFILE="/tmp/Modelfile"
+        echo "FROM glm-4.7-flash" > "$MODELFILE"
+        echo "PARAMETER num_ctx ${OLLAMA_CONTEXT_LENGTH:-65536}" >> "$MODELFILE"
+        echo "PARAMETER temperature 0" >> "$MODELFILE"
+        ollama create glm-4.7-flash-cc -f "$MODELFILE"
+        rm "$MODELFILE"
+        echo "   glm-4.7-flash-cc rebuilt."
+    fi
 else
-    echo ">> qwen3-coder:30b not installed — skipping."
+    echo ">> glm-4.7-flash not installed — skipping."
 fi
 echo ""
 
