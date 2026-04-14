@@ -285,7 +285,7 @@ export ANTHROPIC_DEFAULT_OPUS_MODEL=$OLLAMA_CUSTOM_MODEL
 alias ai='claude --model $OLLAMA_CUSTOM_MODEL --dangerously-skip-permissions'
 
 # Anthropic API via Pro account (OAuth)
-alias ai-api='claude --model claude-sonnet-4-6 --dangerously-skip-permissions'"
+alias ai-api='claude --model claude-sonnet --dangerously-skip-permissions'"
     echo "   Model configured."
 else
     AI_ALIAS="# ai alias not configured — CPU only machine, use Cline + Claude.ai instead"
