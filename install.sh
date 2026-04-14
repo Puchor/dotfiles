@@ -268,18 +268,24 @@ echo ""
 if [ "$CPU_ONLY" = false ]; then
     echo ">> Setting up Ollama model: $OLLAMA_BASE_MODEL"
     ollama pull "$OLLAMA_BASE_MODEL"
-
     MODELFILE="/tmp/Modelfile"
     echo "FROM $OLLAMA_BASE_MODEL" > "$MODELFILE"
     echo "PARAMETER num_ctx $CONTEXT_LENGTH" >> "$MODELFILE"
     echo "PARAMETER temperature 0" >> "$MODELFILE"
     ollama create "$OLLAMA_CUSTOM_MODEL" -f "$MODELFILE"
     rm "$MODELFILE"
-
-    AI_ALIAS="export ANTHROPIC_DEFAULT_HAIKU_MODEL=$OLLAMA_CUSTOM_MODEL
+    AI_ALIAS="# Default: local Ollama
+export ANTHROPIC_AUTH_TOKEN=\"ollama\"
+export ANTHROPIC_BASE_URL=\"http://127.0.0.1:11434\"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=$OLLAMA_CUSTOM_MODEL
 export ANTHROPIC_DEFAULT_SONNET_MODEL=$OLLAMA_CUSTOM_MODEL
 export ANTHROPIC_DEFAULT_OPUS_MODEL=$OLLAMA_CUSTOM_MODEL
-alias ai='claude --dangerously-skip-permissions'"
+
+# Local model
+alias ai='claude --model $OLLAMA_CUSTOM_MODEL --dangerously-skip-permissions'
+
+# Anthropic API via Pro account (OAuth)
+alias ai-api='claude --model claude-sonnet-4-6 --dangerously-skip-permissions'"
     echo "   Model configured."
 else
     AI_ALIAS="# ai alias not configured — CPU only machine, use Cline + Claude.ai instead"
